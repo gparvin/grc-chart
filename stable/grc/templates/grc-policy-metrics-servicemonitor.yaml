@@ -1,0 +1,31 @@
+# Copyright (c) 2021 Red Hat, Inc.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Release.Name }}-policy-metrics
+  namespace: openshift-monitoring
+  labels:
+    app: {{ template "grc.name" . }}
+    chart: {{ template "grc.chart" . }}
+    component: "ocm-policy-metrics"
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/name: {{ template "grc.name" . }}
+    helm.sh/chart: {{ template "grc.chart" . }}
+spec:
+  endpoints:
+  - interval: 60s
+    port: https
+    scheme: https
+    scrapeTimeout: 10s
+    tlsConfig:
+      insecureSkipVerify: true
+  jobLabel: ocm-policy-metrics
+  selector:
+    matchLabels:
+      component: "ocm-policy-metrics"
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
